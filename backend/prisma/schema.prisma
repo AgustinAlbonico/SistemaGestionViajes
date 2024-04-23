@@ -1,0 +1,49 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model admin {
+  admin_username String @id @db.VarChar(255)
+  password       String @db.VarChar(255)
+  nombre         String @db.VarChar(45)
+  apellido       String @db.VarChar(45)
+}
+
+model camionero {
+  username String  @id @db.VarChar(255)
+  password String  @db.VarChar(255)
+  nombre   String  @db.VarChar(45)
+  apellido String  @db.VarChar(45)
+  viaje    viaje[]
+}
+
+model metodo_pago {
+  id_metodoPago Int    @id @default(autoincrement())
+  descripcion   String @db.VarChar(45)
+}
+
+model viaje {
+  nro_viaje           Int       @id @default(autoincrement())
+  fecha_viaje         DateTime  @db.Date
+  fecha_hora_guardado DateTime  @default(now()) @db.DateTime(0)
+  patente             String    @db.VarChar(7)
+  cantKms             Decimal   @db.Decimal(10, 0)
+  observaciones       String?   @db.VarChar(100)
+  particular          Int       @db.TinyInt
+  origen              String    @db.VarChar(45)
+  destino             String    @db.VarChar(45)
+  metodoPago          String    @db.VarChar(45)
+  movimiento          String    @db.VarChar(50)
+  modelo              String    @db.VarChar(45)
+  marca               String    @db.VarChar(45)
+  excedente           Decimal?  @db.Decimal(10, 0)
+  username            String    @db.VarChar(255)
+  camionero           camionero @relation(fields: [username], references: [username], onUpdate: Restrict, map: "viaje_camionero")
+
+  @@index([username], map: "fk_viaje_camionero")
+}
