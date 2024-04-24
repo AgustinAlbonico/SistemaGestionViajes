@@ -1,0 +1,8 @@
+./backend/.env
+./backend/node_modules
+
+./frontend-mobile/.env
+./frontend-mobile/node_modules
+
+./frontend-web/.env
+./frontend-web/node_modules
