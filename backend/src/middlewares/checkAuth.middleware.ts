@@ -1,5 +1,6 @@
-import { NextFunction, Request, Response } from "express";
+import { NextFunction, Response } from "express";
 import { checkAuthToken } from "../utils/checkAuthToken";
+import { CustomUserRequest } from "../models/customRequest.model";
 
 interface PayloadInterface {
   username: string;
@@ -7,7 +8,7 @@ interface PayloadInterface {
   exp: number;
 }
 
-export const checkAuth = (req: Request, res: Response, next: NextFunction) => {
+export const checkAuth = (req: CustomUserRequest, res: Response, next: NextFunction) => {
   const token = req.headers.authorization?.split(" ")[1] as string;
   if (token) {
     const decodedToken = checkAuthToken(token) as PayloadInterface;

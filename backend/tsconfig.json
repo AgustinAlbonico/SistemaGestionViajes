@@ -4,6 +4,7 @@
         "outDir": "./build",
         "strict": true,
         "module": "CommonJS",
-        "esModuleInterop": true
+        "esModuleInterop": true,
+        "typeRoots": ["./types"]
     }
 }

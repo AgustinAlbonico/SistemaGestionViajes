@@ -1,10 +1,11 @@
 import express from "express";
-import { checkAuth } from "../middlewares";
+import { checkAuth, checkAuthAdmin } from "../middlewares";
 import { crearViaje, getViaje, getViajesPagination, getViajesPorMesYAnio, modificarViaje } from "../controllers/ViajeController";
 import { viajeSchema } from "../controllers/schemas";
 const router = express.Router();
 
-router.get("/asd", getViajesPorMesYAnio)
+router.get("/aniomes", checkAuthAdmin, getViajesPorMesYAnio)
+// router.get("/imprimir", imprimirViajesPorMesYAnio)
 
 router.post("/", checkAuth, viajeSchema, crearViaje);
 router.put("/:nro_viaje", checkAuth, viajeSchema, modificarViaje);

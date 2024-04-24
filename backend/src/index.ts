@@ -1,4 +1,4 @@
-import express from "express";
+import express, { Request, Response } from "express";
 import dotenv from "dotenv";
 import morgan from "morgan";
 import cors from "cors";
@@ -24,6 +24,10 @@ app.use(compression());
 const PORT: number = parseInt((process.env.PORT || "3001") as string, 10);
 
 app.use("/api", routes);
+
+app.all('*', (req: Request, res: Response) => {
+  return res.status(404).json({message: 'Endpoint no encontrado, error 404'})
+})
 
 app.use(errorHandler)
 

@@ -1,9 +1,9 @@
 import Navbar from "@/components/Navbar";
 import { columns } from "@/components/columns";
 import { DataTable } from "@/components/data-table";
-import { notifyError } from "@/helpers/toastFunction";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
+
 
 export interface DateStructure {
   mes: number;
@@ -16,7 +16,7 @@ const Home: React.FC = () => {
     anio: new Date().getFullYear(),
   });
 
-  const API_URL = "http://localhost:3000/api/viaje/asd";
+  const API_URL = `${import.meta.env.VITE_API_URL}/viaje/aniomes`
 
   const fetchData = () => {
     return fetch(`${API_URL}?mes=${date.mes}&anio=${date.anio}`).then((res) =>

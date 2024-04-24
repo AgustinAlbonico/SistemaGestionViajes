@@ -10,8 +10,9 @@ import {
   updateViajeService,
 } from "../services/ViajeServices";
 import moment from "moment";
+import { CustomUserRequest } from "../models/customRequest.model";
 
-export const crearViaje = async (req: Request, res: Response) => {
+export const crearViaje = async (req: CustomUserRequest, res: Response) => {
   const resultValidaton = validationResult(req);
   const hasError = !resultValidaton.isEmpty();
 
@@ -67,7 +68,7 @@ export const crearViaje = async (req: Request, res: Response) => {
   }
 };
 
-export const modificarViaje = async (req: Request, res: Response) => {
+export const modificarViaje = async (req: CustomUserRequest, res: Response) => {
   const resultValidaton = validationResult(req);
   const hasError = !resultValidaton.isEmpty();
 
@@ -121,7 +122,7 @@ export const modificarViaje = async (req: Request, res: Response) => {
   }
 };
 
-export const getViajesPagination = async (req: Request, res: Response) => {
+export const getViajesPagination = async (req: CustomUserRequest, res: Response) => {
   try {
     const { limit = 10, page = 1 } = req.query;
 
@@ -149,20 +150,115 @@ export const getViajesPagination = async (req: Request, res: Response) => {
 
 export const getViajesPorMesYAnio = async (req: Request, res: Response) => {
   try {
-    const {mes, anio} = req.query;
+    const { mes, anio } = req.query;
     const parsedMes = Number.parseInt(mes as string);
     const parserAnio = Number.parseInt(anio as string);
 
     const viajes = await getViajesPorMesYAnioService(parsedMes, parserAnio);
 
-    // throw new Error('error xd')
-
-    return res.status(200).json(viajes)
+    return res.status(200).json(viajes);
   } catch (error) {
-    console.log(error)
-    return res.status(500).json({message: "Error en el servidor"})
+    console.log(error);
+    return res.status(500).json({ message: "Error en el servidor" });
   }
 };
+
+// export const imprimirViajesPorMesYAnio = async (
+//   req: Request,
+//   res: Response
+// ) => {
+//   try {
+//     const { mes, anio } = req.query;
+//     const parsedMes = Number.parseInt(mes as string);
+//     const parserAnio = Number.parseInt(anio as string);
+
+//     const viajes = await getViajesPorMesYAnioService(parsedMes, parserAnio);
+
+
+    
+//     const doc = new PDF({ bufferPages: true });
+
+//     const filename = `planilla-viajes-${mes
+//       ?.toString()
+//       .padStart(2, "0")}/${anio}.pdf`;
+
+//     const stream = res.writeHead(200, {
+//       "Content-Type": "application/pdf",
+//       "content-disposition": `attachment; filename=${filename}`,
+//     });
+
+//     doc.on("data", (data) => stream.write(data));
+//     doc.on("end", () => stream.end());
+
+//     doc.addTable(
+//       [
+//         {
+//           key: "nro_viaje",
+//           label: "Nro. viaje",
+//           align: "center",
+//         },
+//         {
+//           key: "fecha_viaje",
+//           label: "Fecha",
+//           align: "center",
+//         },
+//         {
+//           key: "nombre_camionero",
+//           label: "Camionero",
+//           align: "center",
+//         },
+//         {
+//           key: "patente",
+//           label: "Patente",
+//           align: "center",
+//         },
+//         {
+//           key: "movimiento",
+//           label: "Movimiento",
+//           align: "center",
+//         },
+//         {
+//           key: "origen",
+//           label: "Origen",
+//           align: "center",
+//         },
+//         {
+//           key: "destino",
+//           label: "Destino",
+//           align: "center",
+//         },
+
+//         {
+//           key: "particular",
+//           label: "Particular",
+//           align: "center",
+//         },
+//       ],
+//       viajes,
+//       {
+//         border: null,
+//         width: "fill-body",
+//         striped: true,
+//         stripedColors: ['#f6f6f6', '#d6c4dd'],
+//         cellsPadding: 10,
+//         marginLeft: 45,
+//         marginRight: 45,
+//         headAlign: "center",
+//       }
+//     );
+
+//     console.log(doc)
+
+//     doc.render()
+
+//     doc.end();
+
+//     //return res.status(200).json(viajes);
+//   } catch (error) {
+//     console.log(error);
+//     return res.status(500).json({ message: "Error en el servidor" });
+//   }
+// };
 
 export const getViaje = async (req: Request, res: Response) => {
   const nro_viaje: number = Number.parseInt(req.params.nro_viaje);

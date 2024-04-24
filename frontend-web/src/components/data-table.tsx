@@ -2,7 +2,6 @@ import {
   ColumnDef,
   SortingState,
   flexRender,
-  ColumnFiltersState,
   getCoreRowModel,
   getFilteredRowModel,
   getPaginationRowModel,
@@ -27,7 +26,6 @@ import { DateStructure } from "@/pages/Home";
 import { useReactToPrint } from "react-to-print";
 import { notifyError } from "@/helpers/toastFunction";
 import { IoMdArrowDropright, IoMdArrowDropleft } from "react-icons/io";
-import { Input } from "./ui/input";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -47,7 +45,7 @@ export function DataTable<TData, TValue>({
   isError,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = useState<SortingState>([]);
-  const [globalFilter, setGlobalFilter] = useState('')
+  const [globalFilter, setGlobalFilter] = useState("");
 
   const componentPdf = useRef();
 
@@ -76,10 +74,14 @@ export function DataTable<TData, TValue>({
   const imprimirPlanilla = useReactToPrint({
     content: () => {
       if (table.getRowCount() > 0) {
-        return componentPdf.current;
+        componentPdf.current;
       } else {
-        return notifyError("No se puede imprimir una planilla vacia!");
+        notifyError("No se puede imprimir una planilla vacia!");
       }
+      return null;
+    },
+    onAfterPrint: () => {
+      table.setPageSize(10);
     },
   });
 
@@ -89,11 +91,11 @@ export function DataTable<TData, TValue>({
         <div className="flex items-center gap-1 w-[65%]">
           <SearchIcon />
           <DebouncedInput
-          value={globalFilter ?? ''}
-          onChange={value => setGlobalFilter(String(value))}
-          className="p-2 bg-transparent outline-none border-b-2 w-48 transition-all focus:w-56 duration-300 border-indigo-500"
-          placeholder="Busca algun viaje..."
-        />
+            value={globalFilter ?? ""}
+            onChange={(value) => setGlobalFilter(String(value))}
+            className="p-2 bg-transparent outline-none border-b-2 w-48 transition-all focus:w-56 duration-300 border-indigo-500"
+            placeholder="Busca algun viaje..."
+          />
         </div>
         <div className="flex justify-between w-full">
           <div className="flex items-end gap-4">
@@ -127,7 +129,10 @@ export function DataTable<TData, TValue>({
             </div>
           </div>
           <button
-            onClick={imprimirPlanilla}
+            onClick={() => {
+              table.setPageSize(table.getRowCount());
+              imprimirPlanilla();
+            }}
             className="bg-white  px-4 py-2 rounded-lg text-xl border-[1px] border-[#725ba7] text-[#725ba7] hover:bg-[#725ba7] hover:text-white transition-all duration-300 font-bold"
           >
             Descargar planilla

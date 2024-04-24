@@ -17,6 +17,7 @@ export const createViajeService = (viaje: ViajeModel) => {
     username,
     observaciones,
   } = viaje;
+  const parsedParticular = Number(particular);
   const viajeCreado = prisma.viaje.create({
     data: {
       cantKms,
@@ -28,7 +29,7 @@ export const createViajeService = (viaje: ViajeModel) => {
       metodoPago,
       modelo,
       movimiento,
-      particular,
+      particular: parsedParticular,
       patente,
       camionero: { connect: { username } },
     },
@@ -91,6 +92,8 @@ export const updateViajeService = (viaje: ViajeModel, nro_viaje: number) => {
     observaciones,
   } = viaje;
 
+  const parsedParticular = Number(particular);
+
   const viajeCreado = prisma.viaje.update({
     where: {
       nro_viaje,
@@ -105,7 +108,7 @@ export const updateViajeService = (viaje: ViajeModel, nro_viaje: number) => {
       metodoPago,
       modelo,
       movimiento,
-      particular,
+      particular: parsedParticular,
       patente,
       camionero: { connect: { username } },
     },

@@ -1,4 +1,5 @@
 import { checkAuth } from "./checkAuth.middleware";
+import { checkAuthAdmin } from "./checkAuthAdmin.middleware";
 import { errorHandler } from "./errorHandler.middleware";
 
-export {checkAuth, errorHandler}
+export {checkAuth, checkAuthAdmin, errorHandler}
