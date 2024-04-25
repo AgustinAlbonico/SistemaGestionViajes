@@ -1,9 +1,12 @@
 import Navbar from "@/components/Navbar";
 import { columns } from "@/components/columns";
 import { DataTable } from "@/components/data-table";
+import { notifyError } from "@/helpers/toastFunction";
+import { removeLocalStorage } from "@/utilities/HandleLocalStorage";
 import { useQuery } from "@tanstack/react-query";
-import { useEffect, useState } from "react";
-
+import { useEffect, useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import axios from 'axios'
 
 export interface DateStructure {
   mes: number;
@@ -16,28 +19,45 @@ const Home: React.FC = () => {
     anio: new Date().getFullYear(),
   });
 
-  const API_URL = `${import.meta.env.VITE_API_URL}/viaje/aniomes`
+  const navigate = useNavigate();
+  const API_URL = `${import.meta.env.VITE_API_URL}/viaje/aniomes`;
 
-  const fetchData = () => {
-    return fetch(`${API_URL}?mes=${date.mes}&anio=${date.anio}`).then((res) =>
-      res.json()
-    );
+  const token = useMemo(() => {
+    const storage = localStorage.getItem("auth");
+    if (storage) {
+      return JSON.parse(storage).token;
+    }
+  }, []);
+
+  const fetchData = async () => {
+    try {
+      console.log('fetching')
+      const data = await fetch(`${API_URL}?mes=${date.mes}&anio=${date.anio}`, {
+        headers: { Authorization: "Bearer " + token },
+      });
+      const dataJson = await data.json();
+
+      if (!data.ok) {
+        removeLocalStorage();
+        navigate("/login", { replace: true });
+
+        throw new Error(dataJson.message);
+      } else {
+        return dataJson;
+      }
+    } catch (error) {
+      if (error instanceof Error) {
+        notifyError(error?.message);
+      } else {
+        notifyError("Error al traer los datos del servidor");
+      }
+    }
   };
 
-  const { data, isLoading, refetch, isError, error } = useQuery({
+  const { data: viajes, isLoading, isError, error } = useQuery({
     queryKey: ["viajes", date.mes, date.anio],
-    queryFn: fetchData,
+    queryFn: () => fetchData()
   });
-
-  useEffect(() => {
-    fetchData();
-  }, [date, refetch]);
-
-  useEffect(() => {
-    //checkeo mediante el token si la sesion no expiro
-    const checkAuth = async () => {};
-    checkAuth();
-  }, []);
 
   if (isError) return <p>{error.message}</p>;
 
@@ -47,7 +67,7 @@ const Home: React.FC = () => {
       <main className="h-[100%] flex items-center">
         <DataTable
           columns={columns}
-          data={data}
+          data={viajes}
           isLoading={isLoading}
           date={date}
           setDate={setDate}

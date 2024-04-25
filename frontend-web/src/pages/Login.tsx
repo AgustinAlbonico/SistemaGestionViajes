@@ -25,6 +25,7 @@ const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
 
   const navigate = useNavigate();
+  const API_URL = `${import.meta.env.VITE_API_URL}/auth-admin/login`;
 
   useEffect(() => {
     localStorage.removeItem("auth");
@@ -33,16 +34,13 @@ const Login = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const response = await fetch(
-        "http://localhost:3000/api/auth-admin/login",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(loginData),
-        }
-      );
+      const response = await fetch(API_URL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(loginData),
+      });
 
       const responseJson: BackendResponse = await response.json();
 
@@ -62,6 +60,9 @@ const Login = () => {
         message = error.message;
       } else {
         message = error as string;
+      }
+      if ((message === "Failed to fetch")) {
+        message = " Error al conectar con el servidor";
       }
       notifyError(message);
     }

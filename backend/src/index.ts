@@ -20,7 +20,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(morgan("dev"));
 app.use(compression());
-
+ 
 const PORT: number = parseInt((process.env.PORT || "3001") as string, 10);
 
 app.use("/api", routes);

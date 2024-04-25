@@ -2,10 +2,10 @@ import { PrivateRoutes, PublicRoutes } from "@/models/routes";
 import { BrowserRouter, Route } from "react-router-dom";
 import { lazy } from "react";
 
-const Login = lazy(() => import("@/pages/Login"))
-const Home = lazy(() => import("@/pages/Home"))
-const AuthGuard = lazy(() => import("@/guards/auth.guard"))
-const RoutesWithNotFound = lazy(() => import("@/utilities/RoutesWithNotFound"))
+const Login = lazy(() => import("@/pages/Login"));
+const Home = lazy(() => import("@/pages/Home"));
+const AuthGuard = lazy(() => import("@/guards/auth.guard"));
+const RoutesWithNotFound = lazy(() => import("@/utilities/RoutesWithNotFound"));
 
 const Routing = () => {
   return (
