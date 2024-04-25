@@ -1,6 +1,7 @@
 import { NextFunction, Response } from "express";
 import { checkAuthToken } from "../utils/checkAuthToken";
 import { CustomUserRequest } from "../models/customRequest.model";
+import moment from "moment";
 
 interface PayloadInterface {
   username: string;
@@ -12,9 +13,17 @@ export const checkAuth = (req: CustomUserRequest, res: Response, next: NextFunct
   const token = req.headers.authorization?.split(" ")[1] as string;
   if (token) {
     const decodedToken = checkAuthToken(token) as PayloadInterface;
-    req.username = decodedToken.username;
+    const now = moment().unix();
+    if (decodedToken.exp > now) {
+      req.username = decodedToken.username;
+      next();
+    } else {
+      return res
+      .status(401)
+      .json({ message: "Su sesión expiro", expired: true });
+    }
     next();
   } else {
-    return res.status(401).json({ message: "Usted no esta autorizado" });
+    return res.status(401).json({ message: "Usted no esta autorizado", expired: true });
   }
 };
