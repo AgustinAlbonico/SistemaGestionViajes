@@ -1,14 +1,17 @@
 import axios from "axios";
 import { createContext, useState, useContext, useEffect } from "react";
 import * as SecureStore from "expo-secure-store";
-import { API_URL } from "@env";
-import { showErrorToast, showSuccessToast } from "../utils/toastFunctions";
+// import { API_URL } from "../constants";
+import { showErrorToast, showInfoToast, showSuccessToast } from "../utils/toastFunctions";
 import { useNavigation } from "@react-navigation/native";
 import { vibrate } from "../utils/vibrate";
 
 export const AuthContext = createContext();
 
 export const useAuth = () => useContext(AuthContext);
+
+export const API_URL =
+  'https://app-backend-bottarelli-production.up.railway.app/api'
 
 const AuthContextProvider = ({ children }) => {
   const [authState, setAuthState] = useState({

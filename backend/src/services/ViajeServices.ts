@@ -48,7 +48,7 @@ export const getViajesService = (
     },
     orderBy: [
       {
-        fecha_viaje: "asc",
+        fecha_viaje: "desc",
       },
       { fecha_hora_guardado: "desc" },
     ],

@@ -12,7 +12,7 @@ import DateTimePickerModal from "react-native-modal-datetime-picker";
 import { useRoute, useNavigation } from "@react-navigation/native";
 import { useEffect, useState } from "react";
 import axios from "axios";
-import { API_URL } from "@env";
+import { API_URL } from "../context/AuthContextProvider";
 import { showErrorToast, showSuccessToast } from "../utils/toastFunctions";
 import moment from "moment";
 
@@ -210,7 +210,7 @@ const EditarViaje = () => {
               <Text style={styles.label}>Es viaje particular?</Text>
               <CheckBox
                 disabled={false}
-                value={particular}
+                value={particular == 1 ? true : false}
                 onValueChange={(value) => {
                   setParticular(value);
                 }}

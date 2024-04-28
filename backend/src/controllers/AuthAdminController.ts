@@ -9,6 +9,7 @@ import { CustomAdminRequest } from "../models/customRequest.model";
 export const loginAdmin = async (req: Request, res: Response) => {
   const resultValidation = validationResult(req);
   const hasErrors = !resultValidation.isEmpty();
+  console.log(req.body)
 
   if (hasErrors) {
     return res.status(400).json({ message: resultValidation.array()[0].msg });

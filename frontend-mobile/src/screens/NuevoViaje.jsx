@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState } from 'react'
 import {
   ActivityIndicator,
   Pressable,
@@ -7,79 +7,86 @@ import {
   Text,
   TextInput,
   View,
-} from "react-native";
-import CheckBox from "expo-checkbox";
-import DateTimePickerModal from "react-native-modal-datetime-picker";
-import { showErrorToast, showSuccessToast } from "../utils/toastFunctions";
-import axios from "axios";
-import { API_URL } from "@env";
-import { fetchUserInfo } from "../utils/fetchUserInfo";
-import moment from "moment";
+} from 'react-native'
+import CheckBox from 'expo-checkbox'
+import DateTimePickerModal from 'react-native-modal-datetime-picker'
+import { showErrorToast, showSuccessToast } from '../utils/toastFunctions'
+import axios from 'axios'
+import { API_URL } from '../context/AuthContextProvider'
+import { fetchUserInfo } from '../utils/fetchUserInfo'
+import moment from 'moment'
 
 const NuevoViaje = ({ navigation }) => {
   //Datos del viaje
-  const [date, setDate] = useState(new Date());
-  const [showDateModal, setShowDateModal] = useState(false);
+  const [date, setDate] = useState(() =>{
+    const fechaActual = new Date()
+    fechaActual.setHours(fechaActual.getHours() - 3)
+    return fechaActual
+  })
+  const [showDateModal, setShowDateModal] = useState(false)
 
-  const [movimiento, setMovimiento] = useState("");
-  const [movimientoError, setMovimientoError] = useState("");
+  const [movimiento, setMovimiento] = useState('')
+  const [movimientoError, setMovimientoError] = useState('')
 
-  const [patente, setPatente] = useState("");
-  const [patenteError, setPatenteError] = useState("");
+  const [patente, setPatente] = useState('')
+  const [patenteError, setPatenteError] = useState('')
 
-  const [modelo, setModelo] = useState("");
-  const [modeloError, setModeloError] = useState("");
+  const [modelo, setModelo] = useState('')
+  const [modeloError, setModeloError] = useState('')
 
-  const [marca, setMarca] = useState("");
-  const [marcaError, setMarcaError] = useState("");
+  const [marca, setMarca] = useState('')
+  const [marcaError, setMarcaError] = useState('')
 
-  const [cantKms, setCantKms] = useState("");
-  const [cantKmsError, setCantKmsError] = useState("");
+  const [cantKms, setCantKms] = useState('')
+  const [cantKmsError, setCantKmsError] = useState('')
 
-  const [metodoPago, setMetodoPago] = useState("");
-  const [metodoPagoError, setMetodoPagoError] = useState("");
+  const [metodoPago, setMetodoPago] = useState('')
+  const [metodoPagoError, setMetodoPagoError] = useState('')
 
-  const [observaciones, setObservaciones] = useState("");
+  const [observaciones, setObservaciones] = useState('')
 
-  const [particular, setParticular] = useState(false);
+  const [particular, setParticular] = useState(false)
 
-  const [origen, setOrigen] = useState("");
-  const [origenError, setOrigenError] = useState("");
+  const [origen, setOrigen] = useState('')
+  const [origenError, setOrigenError] = useState('')
 
-  const [destino, setDestino] = useState("");
-  const [destinoError, setDestinoError] = useState("");
+  const [destino, setDestino] = useState('')
+  const [destinoError, setDestinoError] = useState('')
 
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(false)
 
   useEffect(() => {
-    fetchUserInfo();
-  }, []);
+    fetchUserInfo()
+  }, [])
+
+  useEffect(() => {
+    console.log(date)
+  }, [date])
 
   const handleSubmit = async (e) => {
-    let cantKmsAux = Number(cantKms);
+    let cantKmsAux = Number(cantKms)
 
-    if (movimiento.length === 0) setMovimientoError("Movimiento vacio");
-    else setMovimientoError("");
-    if (patente.length === 0) setPatenteError("Patente vacia");
-    else setPatenteError("");
-    if (modelo.length === 0) setModeloError("Modelo vacio");
-    else setModeloError("");
-    if (marca.length === 0) setMarcaError("Marca vacia");
-    else setMarcaError("");
-    if (cantKms.length === 0)
-      setCantKmsError("La cant. de kms. no puede ser 0");
-    else setCantKmsError("");
-    if (metodoPago.length === 0) setMetodoPagoError("Metodo de pago vacio");
-    else setMetodoPagoError("");
-    if (movimiento.length === 0) setMovimientoError("Movimiento vacio");
-    else setMovimientoError("");
-    if (origen.length === 0) setOrigenError("Origen vacio");
-    else setOrigenError("");
-    if (destino.length === 0) setDestinoError("Destino vacio");
-    else setDestinoError("");
+    if (movimiento.length === 0) setMovimientoError('Movimiento vacio')
+    else setMovimientoError('')
+    if (patente.length === 0) setPatenteError('Patente vacia')
+    else setPatenteError('')
+    if (modelo.length === 0) setModeloError('Modelo vacio')
+    else setModeloError('')
+    if (marca.length === 0) setMarcaError('Marca vacia')
+    else setMarcaError('')
+    if (cantKms.length === 0) setCantKmsError('La cant. de kms. no puede ser 0')
+    else setCantKmsError('')
+    if (metodoPago.length === 0) setMetodoPagoError('Metodo de pago vacio')
+    else setMetodoPagoError('')
+    if (movimiento.length === 0) setMovimientoError('Movimiento vacio')
+    else setMovimientoError('')
+    if (origen.length === 0) setOrigenError('Origen vacio')
+    else setOrigenError('')
+    if (destino.length === 0) setDestinoError('Destino vacio')
+    else setDestinoError('')
 
     const finalObject = {
-      fecha_viaje: moment(date).utcOffset(3).format("DD/MM/YYYY"),
+      fecha_viaje: moment(date).utcOffset(-3).format('DD/MM/YYYY'),
       movimiento,
       patente,
       marca,
@@ -90,7 +97,7 @@ const NuevoViaje = ({ navigation }) => {
       particular,
       origen,
       destino,
-    };
+    }
 
     if (
       modeloError.length === 0 &&
@@ -104,38 +111,41 @@ const NuevoViaje = ({ navigation }) => {
       destinoError.length === 0
     ) {
       try {
-        setLoading(true);
-        const res = await axios.post(`${API_URL}/viaje`, finalObject);
+        setLoading(true)
+        console.log(finalObject)
+        const res = await axios.post(`${API_URL}/viaje`, finalObject)
 
         if (res.data.success) {
-          showSuccessToast("Viaje guardado con exito");
+          showSuccessToast('Viaje guardado con exito')
 
-          navigation.goBack();
+          navigation.goBack()
         }
       } catch (error) {
-        showErrorToast(error.response.data.message);
+        showErrorToast(error.response.data.message)
       } finally {
-        setLoading(false);
+        setLoading(false)
       }
     }
-  };
+  }
 
   const handleDateChange = (selectedDate) => {
-    if (selectedDate) setDate(selectedDate);
-    setShowDateModal(false);
-  };
+    if (selectedDate) {
+      setDate(selectedDate)
+    }
+    setShowDateModal(false)
+  }
 
   return (
     <View style={styles.container}>
-      <ScrollView style={{ width: "100%" }}>
-        <View style={{ alignItems: "center" }}>
+      <ScrollView style={{ width: '100%' }}>
+        <View style={{ alignItems: 'center' }}>
           <Text
             style={{
-              color: "#524571",
-              textAlign: "center",
+              color: '#524571',
+              textAlign: 'center',
               fontSize: 54,
               padding: 0,
-              fontWeight: "bold",
+              fontWeight: 'bold',
               paddingVertical: 20,
             }}
           >
@@ -145,10 +155,10 @@ const NuevoViaje = ({ navigation }) => {
             style={[
               styles.input_container,
               {
-                flexDirection: "row",
-                alignItems: "center",
-                justifyContent: "space-between",
-                textAlign: "left",
+                flexDirection: 'row',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                textAlign: 'left',
                 marginTop: 10,
               },
             ]}
@@ -158,7 +168,7 @@ const NuevoViaje = ({ navigation }) => {
               disabled={false}
               value={particular}
               onValueChange={(value) => {
-                setParticular(value);
+                setParticular(value)
               }}
               style={{ width: 30, height: 30 }}
             />
@@ -172,13 +182,13 @@ const NuevoViaje = ({ navigation }) => {
                 showDateModal && { opacity: 0.6 },
               ]}
               onPress={() => {
-                setShowDateModal(true);
+                setShowDateModal(true)
               }}
             >
               <Text>{date.toLocaleDateString()}</Text>
               <DateTimePickerModal
-                mode="date"
-                display="default"
+                mode='date'
+                display='default'
                 date={date}
                 isVisible={showDateModal}
                 onConfirm={handleDateChange}
@@ -189,7 +199,7 @@ const NuevoViaje = ({ navigation }) => {
           <View style={styles.input_container}>
             <Text style={styles.label}>Movimiento:</Text>
             <TextInput
-              placeholder="Movimiento"
+              placeholder='Movimiento'
               style={styles.input}
               value={movimiento}
               onChangeText={(text) => setMovimiento(text)}
@@ -201,11 +211,11 @@ const NuevoViaje = ({ navigation }) => {
           <View style={styles.input_container}>
             <Text style={styles.label}>Patente(ABC123 - AB123CD):</Text>
             <TextInput
-              placeholder="Patente"
+              placeholder='Patente'
               style={styles.input}
               value={patente}
               onChangeText={(text) => setPatente(text)}
-              autoCapitalize="characters"
+              autoCapitalize='characters'
             />
             {patenteError.length > 0 && (
               <Text style={styles.error}>{patenteError}</Text>
@@ -214,7 +224,7 @@ const NuevoViaje = ({ navigation }) => {
           <View style={styles.input_container}>
             <Text style={styles.label}>Modelo:</Text>
             <TextInput
-              placeholder="Modelo"
+              placeholder='Modelo'
               style={styles.input}
               value={modelo}
               onChangeText={(text) => setModelo(text)}
@@ -226,7 +236,7 @@ const NuevoViaje = ({ navigation }) => {
           <View style={styles.input_container}>
             <Text style={styles.label}>Marca:</Text>
             <TextInput
-              placeholder="Marca"
+              placeholder='Marca'
               style={styles.input}
               value={marca}
               onChangeText={(text) => setMarca(text)}
@@ -238,11 +248,11 @@ const NuevoViaje = ({ navigation }) => {
           <View style={styles.input_container}>
             <Text style={styles.label}>Cantidad de kilometros:</Text>
             <TextInput
-              placeholder="Cant. Kms"
+              placeholder='Cant. Kms'
               style={styles.input}
               value={cantKms}
               onChangeText={(text) => setCantKms(text)}
-              keyboardType="number-pad"
+              keyboardType='number-pad'
             />
             {cantKmsError.length > 0 && (
               <Text style={styles.error}>{cantKmsError}</Text>
@@ -251,11 +261,11 @@ const NuevoViaje = ({ navigation }) => {
           <View style={styles.input_container}>
             <Text style={styles.label}>Metodo de pago:</Text>
             <TextInput
-              placeholder="Metodo de pago"
+              placeholder='Metodo de pago'
               style={styles.input}
               value={metodoPago}
               onChangeText={(text) => {
-                setMetodoPago(text);
+                setMetodoPago(text)
               }}
             />
             {metodoPagoError.length > 0 && (
@@ -265,19 +275,19 @@ const NuevoViaje = ({ navigation }) => {
           <View style={styles.input_container}>
             <Text style={styles.label}>Observaciones:</Text>
             <TextInput
-              placeholder="Observaciones"
+              placeholder='Observaciones'
               style={styles.input}
               value={observaciones}
               onChangeText={(text) => {
-                setObservaciones(text);
+                setObservaciones(text)
               }}
             />
           </View>
-          <View style={{ width: "100%", alignItems: "center" }}>
+          <View style={{ width: '100%', alignItems: 'center' }}>
             <View style={styles.input_container}>
               <Text style={styles.label}>Origen:</Text>
               <TextInput
-                placeholder="Origen"
+                placeholder='Origen'
                 style={styles.input}
                 value={origen}
                 onChangeText={(text) => setOrigen(text)}
@@ -290,11 +300,11 @@ const NuevoViaje = ({ navigation }) => {
             <View style={styles.input_container}>
               <Text style={styles.label}>Destino:</Text>
               <TextInput
-                placeholder="Destino"
+                placeholder='Destino'
                 style={styles.input}
                 value={destino}
                 onChangeText={(text) => {
-                  setDestino(text);
+                  setDestino(text)
                 }}
               />
               {destinoError.length > 0 && (
@@ -305,10 +315,10 @@ const NuevoViaje = ({ navigation }) => {
 
           <Pressable
             style={{
-              backgroundColor: "#524571",
+              backgroundColor: '#524571',
               borderRadius: 8,
-              width: "70%",
-              display: "flex",
+              width: '70%',
+              display: 'flex',
               padding: 20,
               marginVertical: 20,
             }}
@@ -320,10 +330,10 @@ const NuevoViaje = ({ navigation }) => {
             ) : (
               <Text
                 style={{
-                  fontWeight: "bold",
-                  textAlign: "center",
+                  fontWeight: 'bold',
+                  textAlign: 'center',
                   fontSize: 20,
-                  color: "white",
+                  color: 'white',
                 }}
               >
                 Guardar
@@ -333,26 +343,26 @@ const NuevoViaje = ({ navigation }) => {
         </View>
       </ScrollView>
     </View>
-  );
-};
+  )
+}
 
 const styles = StyleSheet.create({
   container: {
-    height: "100%",
-    width: "100%",
-    justifyContent: "center",
-    alignItems: "center",
+    height: '100%',
+    width: '100%',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   input_container: {
-    width: "80%",
+    width: '80%',
     marginBottom: 10,
   },
   input: {
     paddingHorizontal: 15,
     paddingVertical: 10,
     borderRadius: 8,
-    borderColor: "black",
-    borderStyle: "solid",
+    borderColor: 'black',
+    borderStyle: 'solid',
     borderWidth: 1,
   },
   label: {
@@ -360,8 +370,8 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   error: {
-    color: "red",
+    color: 'red',
   },
-});
+})
 
-export default NuevoViaje;
+export default NuevoViaje

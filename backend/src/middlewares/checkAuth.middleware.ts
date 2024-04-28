@@ -22,7 +22,6 @@ export const checkAuth = (req: CustomUserRequest, res: Response, next: NextFunct
       .status(401)
       .json({ message: "Su sesión expiro", expired: true });
     }
-    next();
   } else {
     return res.status(401).json({ message: "Usted no esta autorizado", expired: true });
   }

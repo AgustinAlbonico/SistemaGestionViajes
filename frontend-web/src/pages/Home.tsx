@@ -4,9 +4,8 @@ import { DataTable } from "@/components/data-table";
 import { notifyError } from "@/helpers/toastFunction";
 import { removeLocalStorage } from "@/utilities/HandleLocalStorage";
 import { useQuery } from "@tanstack/react-query";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from 'axios'
 
 export interface DateStructure {
   mes: number;
@@ -20,7 +19,7 @@ const Home: React.FC = () => {
   });
 
   const navigate = useNavigate();
-  const API_URL = `${import.meta.env.VITE_API_URL}/viaje/aniomes`;
+  const API_URL = `${import.meta.env.VITE_API_URL}/viaje-admin/aniomes`;
 
   const token = useMemo(() => {
     const storage = localStorage.getItem("auth");
@@ -31,7 +30,6 @@ const Home: React.FC = () => {
 
   const fetchData = async () => {
     try {
-      console.log('fetching')
       const data = await fetch(`${API_URL}?mes=${date.mes}&anio=${date.anio}`, {
         headers: { Authorization: "Bearer " + token },
       });

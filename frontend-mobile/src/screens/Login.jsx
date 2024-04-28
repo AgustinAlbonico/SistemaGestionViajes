@@ -10,8 +10,10 @@ import {
 } from "react-native";
 import { useState } from "react";
 import { useAuth } from "../context/AuthContextProvider";
+import { API_URL } from "@env";
 
 import Svg, { Path, G, Circle } from "react-native-svg";
+import { showInfoToast } from "../utils/toastFunctions";
 
 const Home = () => {
   const { login, loading } = useAuth();

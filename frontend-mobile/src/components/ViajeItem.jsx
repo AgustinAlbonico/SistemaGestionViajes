@@ -16,7 +16,7 @@ const ViajeItem = ({ viaje }) => {
           <Text style={styles.column_item}>
             Fecha:{" "}
             <Text style={{ fontWeight: "400", fontSize: 16 }}>
-              {moment(fecha_viaje).utcOffset(3).format("DD-MM-YYYY")}
+              {moment(fecha_viaje).format("DD-MM-YYYY")}
             </Text>
           </Text>
           <Text style={styles.column_item}>
@@ -64,7 +64,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     flexDirection: "row",
     justifyContent: "space-between",
-    width: "98%"
+    width: "90%",
   },
   text_container: { flexDirection: "row", gap: 12, justifyContent:"space-between", width:"85%" },
   column: { justifyContent: "center"},

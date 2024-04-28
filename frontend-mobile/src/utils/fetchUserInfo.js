@@ -1,6 +1,6 @@
 import { showErrorToast, showInfoToast } from "../utils/toastFunctions";
 import axios from "axios";
-import { API_URL } from "@env";
+import { API_URL } from "../context/AuthContextProvider";
 import { useAuth } from "../context/AuthContextProvider";
 
 export const fetchUserInfo = async (setLoggedUser) => {

@@ -26,7 +26,7 @@ export const login = async (req: Request, res: Response) => {
       return res.status(404).json({ message: "No existe ese usuario" });
 
     if (inputUser.password === userDb.password) {
-      const token: string = createAuthToken(userDb);
+      const token = createAuthToken(userDb);
 
       return res.status(200).json({ userDb, token });
     } else {
