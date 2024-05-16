@@ -1,23 +1,28 @@
-import { Request, Response } from 'express'
-import { validationResult } from 'express-validator'
-import { ViajeModel } from '../models/viaje.model'
+import { Request, Response } from "express";
+import { validationResult } from "express-validator";
+import { ViajeModel } from "../models/viaje.model";
 import {
+  crearMetodosDePagoViaje,
   createViajeService,
+  eliminarMetodosPagoParaUnViaje,
   getCantViajesService,
+  getInfoSecundaria,
   getViajeService,
   getViajesPorMesYAnioService,
   getViajesService,
   updateViajeService,
-} from '../services/ViajeServices'
-import moment from 'moment'
-import { CustomUserRequest } from '../models/customRequest.model'
+} from "../services/ViajeServices";
+import moment from "moment";
+import { CustomUserRequest } from "../models/customRequest.model";
 
 export const crearViaje = async (req: CustomUserRequest, res: Response) => {
-  const resultValidaton = validationResult(req)
-  const hasError = !resultValidaton.isEmpty()
+  console.log(req.body)
+
+  const resultValidaton = validationResult(req);
+  const hasError = !resultValidaton.isEmpty();
 
   if (hasError)
-    return res.status(400).json({ message: resultValidaton.array()[0].msg })
+    return res.status(400).json({ message: resultValidaton.array()[0].msg });
 
   const {
     patente,
@@ -27,62 +32,67 @@ export const crearViaje = async (req: CustomUserRequest, res: Response) => {
     particular,
     origen,
     destino,
-    metodoPago,
+    metodosPago,
     cantKms,
     movimiento,
-  } = req.body
+    obervaciones,
+    excedente,
+  } = req.body;
 
-  
-  const fecha = moment(fecha_viaje, 'DD/MM/YYYY', true)
+  const fecha = moment.utc(fecha_viaje, "DD/MM/YYYY");
 
-  if (fecha.isAfter(moment(), 'day'))
+  if (fecha.isAfter(moment(), "day"))
     return res
       .status(400)
-      .json({ message: 'No se puede crear un viaje con fecha mayor a hoy' })
+      .json({ message: "No se puede crear un viaje con fecha mayor a hoy" });
 
-  const [day, month, year] = fecha_viaje.split('/')
+  // const [day, month, year] = fecha_viaje.split("/");
 
-  //Agrego un dia pq la verga de prisma o mysql me corren todo un dia atras
-  const fecha_convertida = moment(`${day}-${month}-${year}`, 'DD-MM-YYYY').add(1,'day')
+  // //Agrego un dia pq la verga de prisma o mysql me corren todo un dia atras
+  // const fecha_convertida = moment(`${day}-${month}-${year}`, "DD-MM-YYYY").add(
+  //   1,
+  //   "day"
+  // );
 
   const inputViaje: ViajeModel = {
     patente,
     particular,
     marca,
     modelo,
-    fecha_viaje: fecha_convertida.toISOString(),
+    fecha_viaje: fecha.toISOString(),
     origen,
     destino,
-    metodoPago,
+    metodosPago,
     cantKms,
     movimiento,
-    observaciones: req?.body?.observaciones,
+    observaciones: obervaciones || null,
+    excedente: excedente || null,
     username: req.username,
-  }
+  };
 
   try {
-    await createViajeService(inputViaje)
+    await createViajeService(inputViaje);
 
     return res.status(200).json({ success: true })
   } catch (error) {
-    console.log(error)
+    console.log(error);
     return res
       .status(500)
-      .json({ success: false, message: 'Error en el servidor' })
+      .json({ success: false, message: "Error en el servidor" });
   }
-}
+};
 
 export const modificarViaje = async (req: CustomUserRequest, res: Response) => {
-  const resultValidaton = validationResult(req)
-  const hasError = !resultValidaton.isEmpty()
+  const resultValidaton = validationResult(req);
+  const hasError = !resultValidaton.isEmpty();
 
   if (hasError)
-    return res.status(400).json({ message: resultValidaton.array()[0].msg })
+    return res.status(400).json({ message: resultValidaton.array()[0].msg });
 
-  const nro_viaje: number = Number.parseInt(req.params.nro_viaje)
+  const nro_viaje: number = Number.parseInt(req.params.nro_viaje);
 
   if (!nro_viaje)
-    return res.status(400).json({ message: 'Nro. de viaje erroneo' })
+    return res.status(400).json({ message: "Nro. de viaje erroneo" });
 
   const {
     patente,
@@ -92,13 +102,15 @@ export const modificarViaje = async (req: CustomUserRequest, res: Response) => {
     particular,
     origen,
     destino,
-    metodoPago,
+    metodosPago,
     cantKms,
     movimiento,
-  } = req.body
+    excedente,
+    observaciones,
+  } = req.body;
 
-  const [day, month, year] = fecha_viaje.split('/')
-  const fecAux = moment(`${day}-${month}-${year}`, 'DD-MM-YYYY').toISOString()
+  const [day, month, year] = fecha_viaje.split("/");
+  const fecAux = moment(`${day}-${month}-${year}`, "DD-MM-YYYY").toISOString();
 
   const inputViaje: ViajeModel = {
     patente,
@@ -108,67 +120,93 @@ export const modificarViaje = async (req: CustomUserRequest, res: Response) => {
     fecha_viaje: fecAux,
     origen,
     destino,
-    metodoPago,
     cantKms,
     movimiento,
-    observaciones: req?.body?.observaciones,
+    observaciones,
+    excedente,
     username: req.username,
-  }
+  };
 
   try {
-    await updateViajeService(inputViaje, nro_viaje)
+    await updateViajeService(inputViaje, nro_viaje);
 
-    return res.status(200).json({ success: true })
+    await eliminarMetodosPagoParaUnViaje(nro_viaje);
+
+    await crearMetodosDePagoViaje(nro_viaje, metodosPago);
+
+    return res.status(200).json({ success: true });
   } catch (error) {
     return res
       .status(500)
-      .json({ success: false, message: 'Error al modificar viaje' })
+      .json({ success: false, message: "Error al modificar viaje" });
   }
-}
+};
 
 export const getViajesPagination = async (
   req: CustomUserRequest,
   res: Response
 ) => {
   try {
-    const { limit = 10, page = 1 } = req.query
+    const { limit = 10, page = 1 } = req.query;
 
     const cantTotalViajes: number = (await getCantViajesService(
       req.username
-    )) as number
-    const parsedLimit: number = Number.parseInt(limit as string)
-    const parsedPage: number = Number.parseInt(page as string)
+    )) as number;
+    const parsedLimit: number = Number.parseInt(limit as string);
+    const parsedPage: number = Number.parseInt(page as string);
 
-    const skip: number = (parsedPage - 1) * parsedLimit
+    const skip: number = (parsedPage - 1) * parsedLimit;
 
-    const viajes = await getViajesService(req.username, parsedLimit, skip)
+    const viajes = await getViajesService(req.username, parsedLimit, skip);
 
-    const cantPages: number = Math.ceil(cantTotalViajes / parsedLimit)
+    const cantPages: number = Math.ceil(cantTotalViajes / parsedLimit);
 
     return res.status(200).json({
       info: { count: cantTotalViajes, pages: cantPages },
       results: viajes,
-    })
+    });
   } catch (error) {
-    console.log('error', error)
-    return res.status(500).json({ message: 'Error en el servidor' })
+    console.log("error", error);
+    return res.status(500).json({ message: "Error en el servidor" });
   }
-}
+};
 
 export const getViajesPorMesYAnio = async (req: Request, res: Response) => {
   try {
-    const { mes, anio } = req.query
-    const parsedMes = Number.parseInt(mes as string)
-    const parserAnio = Number.parseInt(anio as string)
+    const { mes, anio } = req.query;
+    const parsedMes = Number.parseInt(mes as string);
+    const parserAnio = Number.parseInt(anio as string);
 
-    const viajes = await getViajesPorMesYAnioService(parsedMes, parserAnio)
+    if(parsedMes < 1 || parsedMes > 12) return res.status(400).json({message: 'Mes erroneo'})
 
-    return res.status(200).json(viajes)
+    const viajes = await getViajesPorMesYAnioService(parsedMes, parserAnio);
+
+    const viajesTransformados = viajes.map((viaje) => {
+      const metodosPago = viaje.viaje_metodopago.map((vm) => vm.metodo_pago);
+      return {
+        nro_viaje: viaje.nro_viaje,
+        fecha_viaje: viaje.fecha_viaje,
+        particular: viaje.particular,
+        cantKms: viaje.cantKms,
+        origen: viaje.origen,
+        destino: viaje.destino,
+        movimiento: viaje.movimiento,
+        patente: viaje.patente,
+        nombre_camionero: `${viaje.camionero.nombre} ${viaje.camionero.apellido}`,
+        metodosPago: metodosPago,
+      };
+    });
+
+    const datosSecundarios = await getInfoSecundaria(parsedMes, parserAnio)
+   
+    return res
+      .status(200)
+      .json({ viajesTransformados, datosSecundarios});
   } catch (error) {
-    console.log(error)
-    return res.status(500).json({ message: 'Error en el servidor' })
+    console.log(error);
+    return res.status(500).json({ message: "Error en el servidor" });
   }
-}
+};
 
 // export const imprimirViajesPorMesYAnio = async (
 //   req: Request,
@@ -266,12 +304,12 @@ export const getViajesPorMesYAnio = async (req: Request, res: Response) => {
 // };
 
 export const getViaje = async (req: Request, res: Response) => {
-  const nro_viaje: number = Number.parseInt(req.params.nro_viaje)
+  const nro_viaje: number = Number.parseInt(req.params.nro_viaje);
   try {
-    const viaje = await getViajeService(nro_viaje)
+    const viaje = await getViajeService(nro_viaje);
 
-    return res.status(200).json(viaje)
+    return res.status(200).json(viaje);
   } catch (error) {
-    return res.status(500).json({ message: 'Error en el servidor' })
+    return res.status(500).json({ message: "Error en el servidor" });
   }
-}
+};

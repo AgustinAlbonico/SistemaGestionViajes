@@ -15,8 +15,8 @@ export const login = async (req: Request, res: Response) => {
   }
 
   const inputUser = {
-    username: req.body.username,
-    password: req.body.password,
+    username: req.body.username as string,
+    password: req.body.password as string,
   };
 
   try {

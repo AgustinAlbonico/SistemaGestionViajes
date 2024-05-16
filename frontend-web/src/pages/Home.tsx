@@ -1,6 +1,7 @@
 import Navbar from "@/components/Navbar";
-import { columns } from "@/components/columns";
+import { columnsPrincipal, columnsSecundario } from "@/components/columns";
 import { DataTable } from "@/components/data-table";
+import { DataTableSecundaria } from "@/components/data-table-secundaria";
 import { notifyError } from "@/helpers/toastFunction";
 import { removeLocalStorage } from "@/utilities/HandleLocalStorage";
 import { useQuery } from "@tanstack/react-query";
@@ -52,7 +53,7 @@ const Home: React.FC = () => {
     }
   };
 
-  const { data: viajes, isLoading, isError, error } = useQuery({
+  const { data, isLoading, isError, error } = useQuery({
     queryKey: ["viajes", date.mes, date.anio],
     queryFn: () => fetchData()
   });
@@ -62,15 +63,29 @@ const Home: React.FC = () => {
   return (
     <div className="w-full h-full">
       <Navbar />
-      <main className="h-[100%] flex items-center">
+      <main className="h-[100%] mt-24">
+        <h2 className="text-center font-bold text-3xl mb-2">
+          Planilla viajes
+        </h2>
         <DataTable
-          columns={columns}
-          data={viajes}
+          columns={columnsPrincipal}
+          data={data?.viajesTransformados}
           isLoading={isLoading}
           date={date}
           setDate={setDate}
           isError={isError}
         />
+        <div className="mt-12">
+          <h2 className="text-center font-bold text-3xl mb-6">
+            Datos de cada camionero en el mes: {date.mes}/{date.anio}
+          </h2>
+          <DataTableSecundaria
+            columns={columnsSecundario}
+            data={data?.datosSecundarios}
+            isLoading={isLoading}
+            isError={isError}
+          />
+        </div>
       </main>
     </div>
   );

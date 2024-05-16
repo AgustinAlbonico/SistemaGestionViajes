@@ -23,27 +23,39 @@ model camionero {
 }
 
 model metodo_pago {
-  id_metodoPago Int    @id @default(autoincrement())
-  descripcion   String @db.VarChar(45)
+  id_metodoPago    Int                @id @default(autoincrement())
+  descripcion      String             @db.VarChar(45)
+  viaje_metodopago viaje_metodopago[]
 }
 
 model viaje {
-  nro_viaje           Int       @id @default(autoincrement())
-  fecha_viaje         DateTime  @db.Date
-  fecha_hora_guardado DateTime  @default(now()) @db.DateTime(0)
-  patente             String    @db.VarChar(7)
-  cantKms             Decimal   @db.Decimal(10, 0)
-  observaciones       String?   @db.VarChar(100)
-  particular          Int       @db.TinyInt
-  origen              String    @db.VarChar(45)
-  destino             String    @db.VarChar(45)
-  metodoPago          String    @db.VarChar(45)
-  movimiento          String    @db.VarChar(50)
-  modelo              String    @db.VarChar(45)
-  marca               String    @db.VarChar(45)
-  excedente           Decimal?  @db.Decimal(10, 0)
-  username            String    @db.VarChar(255)
-  camionero           camionero @relation(fields: [username], references: [username], onUpdate: Restrict, map: "viaje_camionero")
+  nro_viaje           Int                @id @default(autoincrement())
+  fecha_viaje         DateTime           @db.Date
+  fecha_hora_guardado DateTime           @default(now()) @db.DateTime(0)
+  patente             String             @db.VarChar(7)
+  cantKms             Float              @db.Float
+  particular          Int                @db.TinyInt
+  origen              String             @db.VarChar(45)
+  destino             String             @db.VarChar(45)
+  movimiento          String             @db.VarChar(50)
+  modelo              String             @db.VarChar(45)
+  marca               String             @db.VarChar(45)
+  observaciones       String?            @db.VarChar(100)
+  excedente           Float?             @db.Float
+  username            String             @db.VarChar(255)
+  camionero           camionero          @relation(fields: [username], references: [username], onUpdate: Restrict, map: "viaje_camionero")
+  viaje_metodopago    viaje_metodopago[]
 
   @@index([username], map: "fk_viaje_camionero")
+}
+
+model viaje_metodopago {
+  nro_viaje     Int
+  id_metodoPago Int
+  importe       Float       @db.Float
+  metodo_pago   metodo_pago @relation(fields: [id_metodoPago], references: [id_metodoPago], onDelete: Cascade, map: "fk_metodoPago")
+  viaje         viaje       @relation(fields: [nro_viaje], references: [nro_viaje], onDelete: Cascade, map: "fk_viaje")
+
+  @@id([nro_viaje, id_metodoPago])
+  @@index([id_metodoPago], map: "fk_metodoPago_idx")
 }
