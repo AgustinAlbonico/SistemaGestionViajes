@@ -10,7 +10,7 @@ import { viajeSchema } from "../controllers/schemas";
 const router = express.Router();
 
 router.get("/", checkAuth, getViajesPagination);
-router.post("/", checkAuth, crearViaje);
+router.post("/", checkAuth, viajeSchema ,crearViaje);
 
 router.get("/:nro_viaje", checkAuth, getViaje);
 router.put("/:nro_viaje", checkAuth, viajeSchema, modificarViaje);

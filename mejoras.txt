@@ -1,2 +1,0 @@
-Visuales
-Debounced input para no hacer fetchs tan rapidos

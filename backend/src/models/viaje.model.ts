@@ -15,5 +15,5 @@ export type ViajeModel = {
     modelo: string
     username: string
     excedente?: number
-    metodosPago?: metodoPago[]
+    metodosPago: metodoPago[]
 }

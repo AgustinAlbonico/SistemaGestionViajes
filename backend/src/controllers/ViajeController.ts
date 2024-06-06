@@ -2,9 +2,7 @@ import { Request, Response } from "express";
 import { validationResult } from "express-validator";
 import { ViajeModel } from "../models/viaje.model";
 import {
-  crearMetodosDePagoViaje,
   createViajeService,
-  eliminarMetodosPagoParaUnViaje,
   getCantViajesService,
   getInfoSecundaria,
   getViajeService,
@@ -16,8 +14,6 @@ import moment from "moment";
 import { CustomUserRequest } from "../models/customRequest.model";
 
 export const crearViaje = async (req: CustomUserRequest, res: Response) => {
-  console.log(req.body)
-
   const resultValidaton = validationResult(req);
   const hasError = !resultValidaton.isEmpty();
 
@@ -66,7 +62,7 @@ export const crearViaje = async (req: CustomUserRequest, res: Response) => {
     cantKms,
     movimiento,
     observaciones: obervaciones || null,
-    excedente: excedente || null,
+    excedente,
     username: req.username,
   };
 
@@ -93,6 +89,8 @@ export const modificarViaje = async (req: CustomUserRequest, res: Response) => {
 
   if (!nro_viaje)
     return res.status(400).json({ message: "Nro. de viaje erroneo" });
+
+  console.log(req.body)
 
   const {
     patente,
@@ -123,6 +121,7 @@ export const modificarViaje = async (req: CustomUserRequest, res: Response) => {
     cantKms,
     movimiento,
     observaciones,
+    metodosPago,
     excedente,
     username: req.username,
   };
@@ -130,9 +129,9 @@ export const modificarViaje = async (req: CustomUserRequest, res: Response) => {
   try {
     await updateViajeService(inputViaje, nro_viaje);
 
-    await eliminarMetodosPagoParaUnViaje(nro_viaje);
+    // await eliminarMetodosPagoParaUnViaje(nro_viaje);
 
-    await crearMetodosDePagoViaje(nro_viaje, metodosPago);
+    // await crearMetodosDePagoViaje(nro_viaje, metodosPago);
 
     return res.status(200).json({ success: true });
   } catch (error) {

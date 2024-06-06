@@ -13,7 +13,7 @@ export const useAuth = () => useContext(AuthContext);
 // export const API_URL =
 //   'https://app-backend-bottarelli-production.up.railway.app/api'
 
-export const API_URL = 'https://j2vlf964-3000.brs.devtunnels.ms/api'
+export const API_URL = 'https://b0fmjflq-3000.brs.devtunnels.ms/api'
 
 const AuthContextProvider = ({ children }) => {
   const [authState, setAuthState] = useState({

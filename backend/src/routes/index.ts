@@ -6,7 +6,6 @@ import {default as authAdminRouter} from './authAdminRoutes'
 import {default as viajeRouter} from './viajeRoutes'
 import {default as viajeAdminRouter} from './viajeAdminRoutes'
 
-
 router.use('/auth', authRouter)
 router.use('/auth-admin', authAdminRouter)
 router.use('/viaje', viajeRouter)

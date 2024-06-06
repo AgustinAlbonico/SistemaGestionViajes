@@ -19,9 +19,10 @@ import moment from "moment";
 const NuevoViaje = ({ navigation }) => {
   //Datos del viaje
   const [date, setDate] = useState(() => {
-    const fechaActual = new Date();
-    fechaActual.setHours(fechaActual.getHours() - 3);
-    return fechaActual;
+    // const fechaActual = new Date();
+    // fechaActual.setHours(fechaActual.getHours() - 3);
+    // return fechaActual;
+    return moment.utc().toDate()
   });
   const [showDateModal, setShowDateModal] = useState(false);
 
@@ -41,6 +42,8 @@ const NuevoViaje = ({ navigation }) => {
   const [cantKmsError, setCantKmsError] = useState("");
 
   const [observaciones, setObservaciones] = useState("");
+
+  const [excedente, setExcedente] = useState("");
 
   const [particular, setParticular] = useState(false);
 
@@ -63,25 +66,23 @@ const NuevoViaje = ({ navigation }) => {
   }, []);
 
   const handleSubmit = async (e) => {
-    let cantKmsAux = Number(cantKms);
-
-    // if (movimiento.length === 0) setMovimientoError("Movimiento vacio");
-    // else setMovimientoError("");
-    // if (patente.length === 0) setPatenteError("Patente vacia");
-    // else setPatenteError("");
-    // if (modelo.length === 0) setModeloError("Modelo vacio");
-    // else setModeloError("");
-    // if (marca.length === 0) setMarcaError("Marca vacia");
-    // else setMarcaError("");
-    // if (cantKms.length === 0)
-    //   setCantKmsError("La cant. de kms. no puede ser 0");
-    // else setCantKmsError("");
-    // if (movimiento.length === 0) setMovimientoError("Movimiento vacio");
-    // else setMovimientoError("");
-    // if (origen.length === 0) setOrigenError("Origen vacio");
-    // else setOrigenError("");
-    // if (destino.length === 0) setDestinoError("Destino vacio");
-    // else setDestinoError("");
+    if (movimiento.length === 0) setMovimientoError("Movimiento vacio");
+    else setMovimientoError("");
+    if (patente.length === 0) setPatenteError("Patente vacia");
+    else setPatenteError("");
+    if (modelo.length === 0) setModeloError("Modelo vacio");
+    else setModeloError("");
+    if (marca.length === 0) setMarcaError("Marca vacia");
+    else setMarcaError("");
+    if (cantKms.length === 0)
+      setCantKmsError("La cant. de kms. no puede ser 0");
+    else setCantKmsError("");
+    if (movimiento.length === 0) setMovimientoError("Movimiento vacio");
+    else setMovimientoError("");
+    if (origen.length === 0) setOrigenError("Origen vacio");
+    else setOrigenError("");
+    if (destino.length === 0) setDestinoError("Destino vacio");
+    else setDestinoError("");
 
     const metodoPagoIds = {
       efectivo: 1,
@@ -96,15 +97,14 @@ const NuevoViaje = ({ navigation }) => {
         metodosPago[metodo].length === 0 ? 0 : parseFloat(metodosPago[metodo]),
     }));
 
-    console.log(metodoPagoArray);
-
     const finalObject = {
-      fecha_viaje: moment.utc(date).format("DD/MM/YYYY"),
+      fecha_viaje: moment(date).utc().utcOffset(-180).format("DD/MM/YYYY"),
       movimiento,
       patente,
       marca,
       modelo,
-      cantKms: cantKmsAux,
+      cantKms: Number(cantKms),
+      excedente: Number(excedente),
       metodosPago: metodoPagoArray,
       observaciones,
       particular,
@@ -116,7 +116,7 @@ const NuevoViaje = ({ navigation }) => {
       modeloError.length === 0 &&
       marcaError.length === 0 &&
       patenteError.length === 0 &&
-      cantKmsAux !== 0 &&
+      Number(cantKms) !== 0 &&
       marcaError.length === 0 &&
       movimientoError.length === 0 &&
       origenError.length === 0 &&
@@ -124,10 +124,8 @@ const NuevoViaje = ({ navigation }) => {
     ) {
       try {
 
-        console.log(finalObject)
         setLoading(true);
 
-        console.log(API_URL);
         const res = await axios.post(`${API_URL}/viaje`, finalObject);
 
         if (res.data.success) {
@@ -144,6 +142,7 @@ const NuevoViaje = ({ navigation }) => {
   };
 
   const handleDateChange = (selectedDate) => {
+    console.log(selectedDate)
     if (selectedDate) {
       setDate(selectedDate);
     }
@@ -272,6 +271,16 @@ const NuevoViaje = ({ navigation }) => {
             {cantKmsError.length > 0 && (
               <Text style={styles.error}>{cantKmsError}</Text>
             )}
+          </View>
+          <View style={styles.input_container}>
+            <Text style={styles.label}>Excedente:</Text>
+            <TextInput
+              placeholder="Excedente"
+              style={styles.input}
+              value={excedente}
+              onChangeText={(text) => setExcedente(text)}
+              keyboardType="number-pad"
+            />
           </View>
           <View style={styles.input_container}>
             <Text style={styles.label}>Metodos de pago:</Text>

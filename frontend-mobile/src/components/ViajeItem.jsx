@@ -16,22 +16,28 @@ const ViajeItem = ({ viaje }) => {
           <Text style={styles.column_item}>
             Fecha:{" "}
             <Text style={{ fontWeight: "400", fontSize: 16 }}>
-              {moment(fecha_viaje).format("DD-MM-YYYY")}
+              {moment(fecha_viaje).utc().format("DD-MM-YYYY")}
             </Text>
           </Text>
           <Text style={styles.column_item}>
-            Patente: <Text style={{ fontWeight: "400", fontSize: 16 }}>{patente}</Text>
+            Patente:{" "}
+            <Text style={{ fontWeight: "400", fontSize: 16 }}>{patente}</Text>
           </Text>
           <Text style={styles.column_item}>
-            Movimiento: <Text style={{ fontWeight: "400", fontSize: 16 }}>{movimiento}</Text>
+            Movimiento:{" "}
+            <Text style={{ fontWeight: "400", fontSize: 16 }}>
+              {movimiento}
+            </Text>
           </Text>
         </View>
         <View style={styles.column}>
           <Text style={styles.column_item}>
-            Origen: <Text style={{ fontWeight: "400", fontSize: 16 }}>{origen}</Text>
+            Origen:{" "}
+            <Text style={{ fontWeight: "400", fontSize: 16 }}>{origen}</Text>
           </Text>
           <Text style={styles.column_item}>
-            Destino: <Text style={{ fontWeight: "400", fontSize: 16 }}>{destino}</Text>
+            Destino:{" "}
+            <Text style={{ fontWeight: "400", fontSize: 16 }}>{destino}</Text>
           </Text>
         </View>
       </View>
@@ -49,7 +55,10 @@ const ViajeItem = ({ viaje }) => {
             height={30}
             viewBox="0 0 32 32"
           >
-            <Path d="m0 32 12-4L32 8l-8-8L4 20zm4-4 2.016-5.984 4 4zm4-8L20 8l4 4-12 12z" fill="#E8EAED"/>
+            <Path
+              d="m0 32 12-4L32 8l-8-8L4 20zm4-4 2.016-5.984 4 4zm4-8L20 8l4 4-12 12z"
+              fill="#E8EAED"
+            />
           </Svg>
         </Pressable>
       </View>
@@ -66,8 +75,13 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     width: "90%",
   },
-  text_container: { flexDirection: "row", gap: 12, justifyContent:"space-between", width:"85%" },
-  column: { justifyContent: "center"},
+  text_container: {
+    flexDirection: "row",
+    gap: 12,
+    justifyContent: "space-between",
+    width: "85%",
+  },
+  column: { justifyContent: "center" },
   column_item: { display: "flex", fontSize: 18, fontWeight: "bold" },
   edit_button: {
     justifyContent: "center",

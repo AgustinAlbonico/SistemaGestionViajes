@@ -1,8 +1,8 @@
-import { PrismaClient } from "@prisma/client";
-import { ViajeModel } from "../models/viaje.model";
-import { metodoPago } from "../models/metodoPago.model";
-const prisma = new PrismaClient();
-import moment from "moment";
+import { PrismaClient } from '@prisma/client'
+import { ViajeModel } from '../models/viaje.model'
+// import { metodoPago } from "../models/metodoPago.model";
+const prisma = new PrismaClient()
+import moment from 'moment'
 
 export const createViajeService = (viaje: ViajeModel) => {
   const {
@@ -19,8 +19,8 @@ export const createViajeService = (viaje: ViajeModel) => {
     observaciones,
     excedente,
     metodosPago,
-  } = viaje;
-  const parsedParticular = Number(particular);
+  } = viaje
+  const parsedParticular = Number(particular)
   const viajeCreado = prisma.viaje.create({
     data: {
       cantKms,
@@ -35,6 +35,7 @@ export const createViajeService = (viaje: ViajeModel) => {
       patente,
       camionero: { connect: { username } },
       excedente,
+      fecha_hora_guardado: new Date(),
       viaje_metodopago: {
         create: metodosPago?.map((mp) => ({
           metodo_pago: { connect: { id_metodoPago: mp.id_metodoPago } },
@@ -42,9 +43,9 @@ export const createViajeService = (viaje: ViajeModel) => {
         })),
       },
     },
-  });
-  return viajeCreado;
-};
+  })
+  return viajeCreado
+}
 
 export const getViajesService = (
   username: string,
@@ -57,26 +58,29 @@ export const getViajesService = (
     },
     orderBy: [
       {
-        fecha_viaje: "desc",
+        fecha_viaje: 'desc',
       },
-      { fecha_hora_guardado: "desc" },
+      { fecha_hora_guardado: 'desc' },
     ],
     take: limit,
     skip,
-  });
-};
+  })
+}
 
 export const getCantViajesService = (username: string) => {
-  return prisma.viaje.count({ where: { username } });
-};
+  return prisma.viaje.count({ where: { username } })
+}
 
 export const getViajeService = (nro_viaje: number) => {
   return prisma.viaje.findFirst({
     where: {
       nro_viaje,
     },
-  });
-};
+    include: {
+      viaje_metodopago: { select: { id_metodoPago: true, importe: true } },
+    },
+  })
+}
 
 export const getViajesPorMesYAnioService = (mes: number, anio: number) => {
   // return prisma.$queryRaw`SELECT v.nro_viaje, v.fecha_viaje, v.patente, v.particular, v.origen, v.destino, v.movimiento, CONCAT(c.nombre, " ", c.apellido) as nombre_camionero, mp.descripcion as metodoPago
@@ -88,8 +92,8 @@ export const getViajesPorMesYAnioService = (mes: number, anio: number) => {
   // ORDER BY v.fecha_viaje DESC;`;
 
   //DADO EL MES Y AÑO BUSCO TODOS LOS VIAJES CON SU CAMIONERO Y METODOS DE PAGO
-  const fechaInicio = moment.utc(`${anio}-${mes}-01`, "YYYY-MM-DD").toDate();
-  const fechaFin = moment.utc(fechaInicio).endOf("month").toDate();
+  const fechaInicio = moment.utc(`${anio}-${mes}-01`, 'YYYY-MM-DD').toDate()
+  const fechaFin = moment.utc(fechaInicio).endOf('month').toDate()
 
   return prisma.viaje.findMany({
     where: {
@@ -102,9 +106,9 @@ export const getViajesPorMesYAnioService = (mes: number, anio: number) => {
       camionero: true,
       viaje_metodopago: { include: { metodo_pago: true } },
     },
-    orderBy: { fecha_viaje: "desc" },
-  });
-};
+    orderBy: { fecha_viaje: 'desc' },
+  })
+}
 
 export const getInfoSecundaria = (mes: number, anio: number) => {
   return prisma.$queryRaw`
@@ -134,24 +138,26 @@ export const getInfoSecundaria = (mes: number, anio: number) => {
       MONTH(v.fecha_viaje) = ${mes} AND YEAR(v.fecha_viaje) = ${anio}
     GROUP BY 
       v.username
-  `;
-};
+  `
+}
 
 export const eliminarMetodosPagoParaUnViaje = (nro_viaje: number) => {
-  return prisma.viaje_metodopago.deleteMany({ where: { nro_viaje } });
-};
+  return prisma.viaje_metodopago.deleteMany({ where: { nro_viaje } })
+}
 
-export const crearMetodosDePagoViaje = (
-  nro_viaje: number,
-  metodosPago: metodoPago[]
-) => {
-  const viaje_metodosPago = metodosPago.map((metodo) => ({
-    nro_viaje,
-    id_metodoPago: metodo.id_metodoPago,
-  }));
+// export const crearMetodosDePagoViaje = (
+//   nro_viaje: number,
+//   metodosPago: metodoPago[]
+// ) => {
+//   const viaje_metodosPago = metodosPago.map((metodo) => ({
+//     nro_viaje,
+//     id_metodoPago: metodo.id_metodoPago,
+//   }));
 
-  return prisma.viaje_metodopago.createMany({ data: viaje_metodosPago });
-};
+//   console.log(viaje_metodosPago);
+
+//   return prisma.viaje_metodopago.createMany({ data: viaje_metodosPago });
+// };
 
 export const updateViajeService = (viaje: ViajeModel, nro_viaje: number) => {
   const {
@@ -163,13 +169,14 @@ export const updateViajeService = (viaje: ViajeModel, nro_viaje: number) => {
     movimiento,
     origen,
     particular,
+    metodosPago,
     patente,
     username,
     observaciones,
     excedente,
-  } = viaje;
+  } = viaje
 
-  const parsedParticular = Number(particular);
+  const parsedParticular = Number(particular)
 
   return prisma.viaje.update({
     where: {
@@ -188,6 +195,16 @@ export const updateViajeService = (viaje: ViajeModel, nro_viaje: number) => {
       patente,
       particular: parsedParticular,
       camionero: { connect: { username } },
+      viaje_metodopago: {
+        updateMany: metodosPago.map((mp) => ({
+          data: {
+            importe: mp.importe,
+          },
+          where: {
+            id_metodoPago: mp.id_metodoPago,
+          },
+        })),
+      },
     },
-  });
-};
+  })
+}

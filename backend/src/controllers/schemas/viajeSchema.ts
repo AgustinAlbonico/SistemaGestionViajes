@@ -50,6 +50,8 @@ export const viajeSchema = [
     .withMessage("Viaje sin cant. de kms cargado")
     .isNumeric()
     .withMessage("Cant. de kms con formato incorrecto"),
+    check("excedente")
+    .default(0),
   check("metodosPago")
     .exists()
     .withMessage("Viaje sin metodo de pago cargado")
