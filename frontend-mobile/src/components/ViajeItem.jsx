@@ -29,8 +29,6 @@ const ViajeItem = ({ viaje }) => {
               {movimiento}
             </Text>
           </Text>
-        </View>
-        <View style={styles.column}>
           <Text style={styles.column_item}>
             Origen:{" "}
             <Text style={{ fontWeight: "400", fontSize: 16 }}>{origen}</Text>
@@ -40,6 +38,9 @@ const ViajeItem = ({ viaje }) => {
             <Text style={{ fontWeight: "400", fontSize: 16 }}>{destino}</Text>
           </Text>
         </View>
+        {/* <View style={styles.column}>
+          
+        </View> */}
       </View>
       <View style={{ justifyContent: "center" }}>
         <Pressable
@@ -51,8 +52,8 @@ const ViajeItem = ({ viaje }) => {
         >
           <Svg
             xmlns="http://www.w3.org/2000/svg"
-            width={30}
-            height={30}
+            width={38}
+            height={38}
             viewBox="0 0 32 32"
           >
             <Path

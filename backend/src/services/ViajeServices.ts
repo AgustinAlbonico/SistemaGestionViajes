@@ -104,7 +104,10 @@ export const getViajesPorMesYAnioService = (mes: number, anio: number) => {
     },
     include: {
       camionero: true,
-      viaje_metodopago: { include: { metodo_pago: true } },
+      viaje_metodopago: {
+        select: {importe: true, metodo_pago: { select: {descripcion: true}}},
+        where: { importe: { gt: 0 } },
+      },
     },
     orderBy: { fecha_viaje: 'desc' },
   })

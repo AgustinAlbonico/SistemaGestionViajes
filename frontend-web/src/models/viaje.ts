@@ -1,6 +1,7 @@
 export type MetodoPagoModel = {
     id_metodoPago: number,
-    descripcion: string
+    descripcion: string,
+    importe: number
 }
 
 export type ViajeModel = {

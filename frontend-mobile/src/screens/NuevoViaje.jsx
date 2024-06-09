@@ -142,7 +142,6 @@ const NuevoViaje = ({ navigation }) => {
   };
 
   const handleDateChange = (selectedDate) => {
-    console.log(selectedDate)
     if (selectedDate) {
       setDate(selectedDate);
     }
@@ -207,6 +206,7 @@ const NuevoViaje = ({ navigation }) => {
                 isVisible={showDateModal}
                 onConfirm={handleDateChange}
                 onCancel={() => setShowDateModal(false)}
+                maximumDate={new Date()}
               />
             </Pressable>
           </View>

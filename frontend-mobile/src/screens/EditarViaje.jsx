@@ -125,7 +125,7 @@ const EditarViaje = () => {
         if (res.data.success) {
           showSuccessToast('Viaje modificado con exito')
 
-          //navigation.goBack()
+          navigation.goBack()
         }
       } catch (error) {
         showErrorToast(error.response.data.message)
@@ -159,11 +159,9 @@ const EditarViaje = () => {
         setExcedente(viaje.excedente.toString())
         setOrigen(viaje.origen)
         setDestino(viaje.destino)
-        viaje.observaciones && console.log(viaje.observaciones)
         if (viaje.particular === 0) setParticular(false)
         else setParticular(true)
       } catch (error) {
-        console.log(error)
         showErrorToast('Error al cargar el viaje')
         navigation.goBack()
       } finally {

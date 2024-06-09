@@ -9,6 +9,10 @@ import { StatusBar } from 'expo-status-bar'
 import NuevoViaje from './src/screens/NuevoViaje'
 import MisViajes from './src/screens/MisViajes'
 import EditarViaje from './src/screens/EditarViaje'
+import { Text } from 'react-native'
+
+Text.defaultProps = Text.defaultProps || {};
+Text.defaultProps.allowFontScaling = false;
 
 const Stack = createNativeStackNavigator()
 

@@ -181,7 +181,10 @@ export const getViajesPorMesYAnio = async (req: Request, res: Response) => {
     const viajes = await getViajesPorMesYAnioService(parsedMes, parserAnio);
 
     const viajesTransformados = viajes.map((viaje) => {
-      const metodosPago = viaje.viaje_metodopago.map((vm) => vm.metodo_pago);
+      const metodosPago = viaje.viaje_metodopago.map((vm) => ({
+        importe: vm.importe,
+        descripcion: vm.metodo_pago.descripcion
+      }));
       return {
         nro_viaje: viaje.nro_viaje,
         fecha_viaje: viaje.fecha_viaje,

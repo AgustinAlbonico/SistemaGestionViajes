@@ -60,9 +60,11 @@ CREATE TABLE `metodo_pago` (
   `id_metodoPago` int NOT NULL AUTO_INCREMENT,
   `descripcion` varchar(45) NOT NULL,
   PRIMARY KEY (`id_metodoPago`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
+
+INSERT INTO metodo_pago (descripcion) VALUES ('EFECTIVO', 'TRANSFERENCIA', 'OTROS');
 --
 -- Table structure for table `viaje`
 --
@@ -88,7 +90,7 @@ CREATE TABLE `viaje` (
   PRIMARY KEY (`nro_viaje`),
   KEY `fk_viaje_camionero` (`username`),
   CONSTRAINT `viaje_camionero` FOREIGN KEY (`username`) REFERENCES `camionero` (`username`) ON DELETE RESTRICT ON UPDATE RESTRICT
-) ENGINE=InnoDB AUTO_INCREMENT=37 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
