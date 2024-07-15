@@ -31,7 +31,7 @@ export const crearViaje = async (req: CustomUserRequest, res: Response) => {
     metodosPago,
     cantKms,
     movimiento,
-    obervaciones,
+    observaciones,
     excedente,
   } = req.body;
 
@@ -61,7 +61,7 @@ export const crearViaje = async (req: CustomUserRequest, res: Response) => {
     metodosPago,
     cantKms,
     movimiento,
-    observaciones: obervaciones || null,
+    observaciones: observaciones || null,
     excedente,
     username: req.username,
   };
