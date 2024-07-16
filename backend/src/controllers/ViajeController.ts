@@ -193,6 +193,7 @@ export const getViajesPorMesYAnio = async (req: Request, res: Response) => {
         origen: viaje.origen,
         destino: viaje.destino,
         movimiento: viaje.movimiento,
+        observaciones: viaje.observaciones,
         patente: viaje.patente,
         nombre_camionero: `${viaje.camionero.nombre} ${viaje.camionero.apellido}`,
         metodosPago: metodosPago,

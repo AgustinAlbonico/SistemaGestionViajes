@@ -82,6 +82,7 @@ export const columnsPrincipal: ColumnDef<ViajeModel>[] = [
   { accessorKey: 'origen', header: 'Origen' },
   { accessorKey: 'destino', header: 'Destino' },
   { accessorKey: 'movimiento', header: 'Movimiento' },
+  { accessorKey: 'observaciones', header: 'Obs.' },
   { accessorKey: 'patente', header: 'Patente' },
   {
     accessorKey: 'particular',
