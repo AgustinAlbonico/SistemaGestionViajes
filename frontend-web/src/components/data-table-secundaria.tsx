@@ -18,23 +18,26 @@ import {
 } from "@/components/ui/table";
 
 import { SpinnerCircular } from "spinners-react";
+import { Total } from "@/pages/Home";
+import { PlanillaSecundariaModel } from "@/models/planillaSecundaria";
 
-interface DataTableProps<TData, TValue> {
-  columns: ColumnDef<TData, TValue>[];
-  data: TData[];
+interface DataTableProps {
+  columns: ColumnDef<PlanillaSecundariaModel>[];
+  data?: PlanillaSecundariaModel[];
   isLoading: boolean;
   isError: boolean;
+  total: Total;
 }
 
-export function DataTableSecundaria<TData, TValue>({
+export function DataTableSecundaria({
   columns,
   data,
   isLoading,
   isError,
-}: DataTableProps<TData, TValue>) {
-
+  total,
+}: DataTableProps) {
   const table = useReactTable({
-    data,
+    data: data || [],
     columns,
     getFilteredRowModel: getFilteredRowModel(),
     getCoreRowModel: getCoreRowModel(),
@@ -43,7 +46,7 @@ export function DataTableSecundaria<TData, TValue>({
   });
 
   return (
-    <div className="w-[90%] mx-auto min-h-[60%]">      
+    <div className="w-[90%] mx-auto min-h-[60%]">
       <div className={`rounded-md border`}>
         <Table>
           <TableHeader>
@@ -70,22 +73,59 @@ export function DataTableSecundaria<TData, TValue>({
           <TableBody>
             {!isLoading ? (
               table.getRowModel().rows?.length > 0 && !isError ? (
-                table.getRowModel().rows.map((row) => (
-                  <TableRow
-                    key={row.id}
-                    data-state={row.getIsSelected() && "selected"}
-                    className="text-center"
-                  >
-                    {row.getVisibleCells().map((cell) => (
-                      <TableCell key={cell.id}>
-                        {flexRender(
-                          cell.column.columnDef.cell,
-                          cell.getContext()
-                        )}
-                      </TableCell>
-                    ))}
+                <>
+                  {table.getRowModel().rows.map((row) => (
+                    <TableRow
+                      key={row.id}
+                      data-state={row.getIsSelected() && "selected"}
+                      className="text-center"
+                    >
+                      {row.getVisibleCells().map((cell) => {
+
+                        return cell.column.id == "nombreCamionero" ? (
+                          <TableCell key={cell.id}>
+                            {cell.getValue() as string}
+                          </TableCell>
+                        ) : (
+                          <TableCell key={cell.id}>
+                            {`${Number(cell.getValue() as string).toLocaleString(
+                              "es-AR",
+                              {
+                                minimumFractionDigits: 0,
+                              }
+                            )}`}<span className="font-bold">{" "}$</span>
+                          </TableCell>
+                        );
+                      })}
+                    </TableRow>
+                  ))}
+                  <TableRow className="bg-gray-100">
+                    <TableCell className="font-bold text-center text-xl">
+                      Total:
+                    </TableCell>
+                    <TableCell />
+                    <TableCell />
+                    <TableCell />
+                    <TableCell className="text-center">
+                      {total.efectivo.toLocaleString("es-AR", {
+                        minimumFractionDigits: 0,
+                      })}
+                      <span className="font-bold"> $</span>
+                    </TableCell>
+                    <TableCell className="text-center">
+                      {total.transferencia.toLocaleString("es-AR", {
+                        minimumFractionDigits: 0,
+                      })}
+                      <span className="font-bold"> $</span>
+                    </TableCell>
+                    <TableCell className="text-center">
+                      {total.otros.toLocaleString("es-AR", {
+                        minimumFractionDigits: 0,
+                      })}
+                      <span className="font-bold"> $</span>
+                    </TableCell>
                   </TableRow>
-                ))
+                </>
               ) : !isError ? (
                 <TableRow>
                   <TableCell
@@ -112,7 +152,7 @@ export function DataTableSecundaria<TData, TValue>({
               </TableRow>
             )}
           </TableBody>
-        </Table>  
+        </Table>
       </div>
     </div>
   );

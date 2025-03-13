@@ -18,40 +18,39 @@ import {
   TableRow,
 } from "@/components/ui/table";
 
+import { useState } from "react";
 import { SpinnerCircular } from "spinners-react";
-import { useState, useRef, useEffect } from "react";
 import { SearchIcon } from "@/assets/svg/SvgIcons";
 import DebouncedInput from "./DebouncedInput";
 import { DateStructure } from "@/pages/Home";
 import { IoMdArrowDropright, IoMdArrowDropleft } from "react-icons/io";
-import html2canvas from "html2canvas";
-import jsPDF from "jspdf";
 
-interface DataTableProps<TData, TValue> {
-  columns: ColumnDef<TData, TValue>[];
-  data: TData[];
+import exportToExcel from "@/utilities/exportToExcel";
+import { ViajeModel } from "@/models/viaje";
+
+interface DataTableProps {
+  columns: ColumnDef<ViajeModel>[];
+  data?: ViajeModel[];
   isLoading: boolean;
   date: DateStructure;
   setDate: React.Dispatch<React.SetStateAction<DateStructure>>;
   isError: boolean;
 }
 
-export function DataTable<TData, TValue>({
+export function DataTable({
   columns,
   data,
   isLoading,
   date,
   setDate,
   isError,
-}: DataTableProps<TData, TValue>) {
+}: DataTableProps) {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [globalFilter, setGlobalFilter] = useState("");
-  const [shouldPrint, setShouldPrint] = useState(false);
 
-  const pdfRef = useRef<HTMLTableElement>(null);
-
+  //Creo el objeto tabla de Tanstack Table
   const table = useReactTable({
-    data,
+    data: data || [],
     columns,
     getFilteredRowModel: getFilteredRowModel(),
     getCoreRowModel: getCoreRowModel(),
@@ -65,6 +64,7 @@ export function DataTable<TData, TValue>({
     },
   });
 
+  //Manejador para el estado del mes y año
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newNumber = parseInt(e.target.value);
     if (newNumber === 13) {
@@ -79,48 +79,12 @@ export function DataTable<TData, TValue>({
     }));
   };
 
-  const imprimirPlanilla = () => {
-    const input = pdfRef.current;
-    if (input) {
-      // html2canvas(input).then((canvas) => {
-      //   const imgData = canvas.toDataURL('image/png')
-      //   const pdf = new jsPDF('p', 'mm', 'a4', false)
-      //   const pdfWidth = pdf.internal.pageSize.getWidth()
-      //   const pdfHeight = pdf.internal.pageSize.getHeight()
-      //   const imgWidth = canvas.width
-      //   const imgHeight = canvas.height
-      //   const ratio = Math.min(pdfWidth / imgWidth, pdfHeight / imgHeight)
-      //   const imgX = (pdfWidth - imgWidth * ratio) / 2
-      //   const imgY = 30
-      //   pdf.addImage(
-      //     imgData,
-      //     'PNG',
-      //     imgX,
-      //     imgY,
-      //     imgWidth * ratio,
-      //     imgHeight * ratio
-      //   )
-      //   pdf.save('planilla')
-      // })
-      html2canvas(input, { logging: true, useCORS: true }).then((canvas) => {
-        const imgData = canvas.toDataURL("img/png");
-        const pdf = new jsPDF("p", "mm", "a4", false);
-        const imgWidth = 208;
-        const imgHeight = (canvas.height * imgWidth) / canvas.width;
-
-        pdf.addImage(imgData, "PNG", 0, 0, imgWidth, imgHeight);
-        pdf.save("planilla.pdf");
-      });
+  //Handler para manejar el export del excel con los viajes
+  const handleExport = () => {
+    if (data && data.length > 0) {
+      exportToExcel(data, date);
     }
   };
-
-  useEffect(() => {
-    if (shouldPrint) {
-      imprimirPlanilla();
-      table.setPageSize(10);
-      setShouldPrint(false);
-    }
-  }, [shouldPrint]);
 
   return (
     <div className="w-[90%] mx-auto min-h-[60%]">
@@ -134,6 +98,7 @@ export function DataTable<TData, TValue>({
             placeholder="Busca algun viaje..."
           />
         </div>
+
         <div className="flex justify-center sm:flex-row sm:gap-0 gap-8 flex-col sm:justify-between w-full">
           <div className="flex items-end justify-center sm:justify-normal gap-4">
             <div className="flex items-end gap-3">
@@ -165,10 +130,10 @@ export function DataTable<TData, TValue>({
               />
             </div>
           </div>
+
           <button
             onClick={() => {
-              table.setPageSize(table.getRowCount());
-              setShouldPrint(true);
+              handleExport();
             }}
             className="mx-auto sm:mx-0 bg-white md:px-4 md:py-2 px-2 py-2 rounded-lg md:text-xl text-base border-[1px] 
             border-[#725ba7] text-[#725ba7] hover:bg-[#725ba7] hover:text-white transition-all duration-300 font-bold sm:w-auto w-[50%]"
@@ -177,8 +142,9 @@ export function DataTable<TData, TValue>({
           </button>
         </div>
       </div>
+
       <div className={`rounded-md border`}>
-        <Table ref={pdfRef}>
+        <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
@@ -209,14 +175,36 @@ export function DataTable<TData, TValue>({
                     data-state={row.getIsSelected() && "selected"}
                     className="text-center"
                   >
-                    {row.getVisibleCells().map((cell) => (
-                      <TableCell key={cell.id}>
-                        {flexRender(
-                          cell.column.columnDef.cell,
-                          cell.getContext()
-                        )}
-                      </TableCell>
-                    ))}
+                    {row.getVisibleCells().map((cell) => {
+                      //Este mambo es para formatear bien con el punto millar a cada metodo de pago y su importe
+                      return cell.column.id !== "metodosPago" ? (
+                        <TableCell key={cell.id}>
+                          {flexRender(
+                            cell.column.columnDef.cell,
+                            cell.getContext()
+                          )}
+                        </TableCell>
+                      ) : (
+                        <TableCell key={cell.id}>
+                          {Array.isArray(cell.getValue())
+                            ? (
+                                cell.getValue() as {
+                                  descripcion: string;
+                                  importe: number;
+                                }[]
+                              ).map((item, index) => (
+                                <div key={index}>
+                                  <strong>{item.descripcion}:</strong> $
+                                  {item.importe.toLocaleString("es-AR")}
+                                </div>
+                              ))
+                            : String(
+                                cell.getValue()
+                              ) // Si no es un array, renderiza el valor normalmente
+                          }
+                        </TableCell>
+                      );
+                    })}
                   </TableRow>
                 ))
               ) : !isError ? (

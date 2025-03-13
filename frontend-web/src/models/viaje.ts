@@ -14,6 +14,7 @@ export type ViajeModel = {
     destino: string,
     movimiento: string,
     patente: string,
-    particular: boolean
+    particular: boolean,
+    observaciones?: string
 }
 

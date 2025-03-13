@@ -2,9 +2,10 @@ import { check } from "express-validator";
 
 const patenteVieja = /(^[A-Z]{3}\d{3}$)/;
 const patenteNueva = /(^[A-Z]{2}\d{3}[A-Z]{2}$)/;
+const patenteMoto =  /(^[A-Z]{1}\d{3}[A-Z]{3}$)/
 
 const patentesCombinadas = new RegExp(
-  `${patenteVieja.source}|${patenteNueva.source}`
+  `${patenteVieja.source}|${patenteNueva.source}|${patenteMoto.source}`
 );
 
 export const viajeSchema = [
