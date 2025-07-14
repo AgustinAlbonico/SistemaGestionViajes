@@ -81,19 +81,28 @@ export function DataTableSecundaria({
                       className="text-center"
                     >
                       {row.getVisibleCells().map((cell) => {
-
                         return cell.column.id == "nombreCamionero" ? (
                           <TableCell key={cell.id}>
                             {cell.getValue() as string}
                           </TableCell>
+                        ) : cell.column.id == "cantKmsRecorridos" ||
+                          cell.column.id == "cantViajesParticulares" ||
+                          cell.column.id == "cantViajesTotales" ? (
+                          <TableCell key={cell.id}>
+                            {`${Number(
+                              cell.getValue() as string
+                            ).toLocaleString("es-AR", {
+                              minimumFractionDigits: 0,
+                            })}`}
+                          </TableCell>
                         ) : (
                           <TableCell key={cell.id}>
-                            {`${Number(cell.getValue() as string).toLocaleString(
-                              "es-AR",
-                              {
-                                minimumFractionDigits: 0,
-                              }
-                            )}`}<span className="font-bold">{" "}$</span>
+                            {`${Number(
+                              cell.getValue() as string
+                            ).toLocaleString("es-AR", {
+                              minimumFractionDigits: 0,
+                            })}`}
+                            <span className="font-bold"> $</span>
                           </TableCell>
                         );
                       })}
