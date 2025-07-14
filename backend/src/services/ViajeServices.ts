@@ -116,33 +116,60 @@ export const getViajesPorMesYAnioService = (mes: number, anio: number) => {
 export const getInfoSecundaria = (mes: number, anio: number) => {
   return prisma.$queryRaw`
     SELECT
-      CONCAT(c.nombre, ' ', c.apellido) as nombreCamionero,
-      ROUND(SUM(v.cantKms), 2) as cantKmsRecorridos,
-      CAST(COUNT(v.username) AS CHAR) as cantViajesTotales,
-      CAST(COUNT(CASE WHEN v.particular = 1 THEN 1 END) AS CHAR) as cantViajesParticulares,
-      CAST(SUM(CASE WHEN mp.id_metodoPago = 1 THEN vmp.importe ELSE 0 END) AS CHAR) AS efectivo,
-	    CAST(SUM(CASE WHEN mp.id_metodoPago = 2 THEN vmp.importe ELSE 0 END) AS CHAR) AS transferencia,
-	    CAST(SUM(CASE WHEN mp.id_metodoPago = 3 THEN vmp.importe ELSE 0 END) AS CHAR) AS otros 
-    FROM 
-      viaje v
-    INNER JOIN 
-      camionero c 
-    ON 
-      v.username = c.username
-	  INNER JOIN 
-      viaje_metodopago vmp
-    ON 
-      vmp.nro_viaje = v.nro_viaje
-	  INNER JOIN 
-      metodo_pago mp
-    ON 
-      vmp.id_metodoPago = mp.id_metodoPago
-    WHERE 
-      MONTH(v.fecha_viaje) = ${mes} AND YEAR(v.fecha_viaje) = ${anio}
-    GROUP BY 
-      v.username
-  `
-}
+      CONCAT(c.nombre, ' ', c.apellido) AS nombreCamionero,
+      ROUND(SUM(vu.cantKms), 2) AS cantKmsRecorridos,
+      CAST(COUNT(*) AS CHAR) AS cantViajesTotales,
+      CAST(SUM(vu.particular) AS CHAR) AS cantViajesParticulares,
+      CAST(SUM(COALESCE(p.metodopago1, 0)) AS CHAR) AS efectivo,
+      CAST(SUM(COALESCE(p.metodopago2, 0)) AS CHAR) AS transferencia,
+      CAST(SUM(COALESCE(p.metodopago3, 0)) AS CHAR) AS otros
+    FROM (
+      -- viajes únicos (para evitar el triple conteo)
+      SELECT
+        v.nro_viaje,
+        v.username,
+        v.cantKms,
+        v.particular
+      FROM viaje v
+      WHERE MONTH(v.fecha_viaje) = ${mes}
+        AND YEAR(v.fecha_viaje) = ${anio}
+      GROUP BY
+        v.nro_viaje,
+        v.username,
+        v.cantKms,
+        v.particular
+    ) vu
+    INNER JOIN camionero c
+      ON vu.username = c.username
+    LEFT JOIN (
+      -- métodos de pago pivoteados por nro_viaje
+      SELECT
+        pagos.nro_viaje,
+        SUM(CASE WHEN pagos.id_metodoPago = 1 THEN pagos.total_importe ELSE 0 END) AS metodopago1,
+        SUM(CASE WHEN pagos.id_metodoPago = 2 THEN pagos.total_importe ELSE 0 END) AS metodopago2,
+        SUM(CASE WHEN pagos.id_metodoPago = 3 THEN pagos.total_importe ELSE 0 END) AS metodopago3
+      FROM (
+        SELECT
+          vmp.nro_viaje,
+          vmp.id_metodoPago,
+          SUM(vmp.importe) AS total_importe
+        FROM viaje v
+        INNER JOIN viaje_metodopago vmp
+          ON vmp.nro_viaje = v.nro_viaje
+        WHERE MONTH(v.fecha_viaje) = ${mes}
+          AND YEAR(v.fecha_viaje) = ${anio}
+        GROUP BY
+          vmp.nro_viaje,
+          vmp.id_metodoPago
+      ) pagos
+      GROUP BY pagos.nro_viaje
+    ) p
+      ON vu.nro_viaje = p.nro_viaje
+    GROUP BY
+      vu.username, c.nombre, c.apellido
+  `;
+};
+
 
 export const eliminarMetodosPagoParaUnViaje = (nro_viaje: number) => {
   return prisma.viaje_metodopago.deleteMany({ where: { nro_viaje } })
